@@ -1,10 +1,32 @@
-const express = require('express')
-const path = require('path')
-const PORT = process.env.PORT || 5000
+var api = require('./api');
 
-express()
-  .use(express.static(path.join(__dirname, 'public')))
-  .set('views', path.join(__dirname, 'views'))
-  .set('view engine', 'ejs')
-  .get('/', (req, res) => res.render('pages/index'))
-  .listen(PORT, () => console.log(`Listening on ${ PORT }`))
+var express = require('express');
+var path = require('path');
+var bodyParser = require('body-parser');
+
+var app = express();
+
+var port = process.env.PORT || 5000;
+
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
+// body parser middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+// get api
+app.get('/api', api);
+
+// error handler
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(400).send(err.message);
+});
+
+app.listen(port, function() {
+  console.log('GSX2JSON listening on port ' + port);
+});
